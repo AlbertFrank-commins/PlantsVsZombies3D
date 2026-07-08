@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\1_Core_Logica_cpp">
+      <UniqueIdentifier>{907ef368-1e36-4bb4-b232-d7f3bdfd73e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\1_Core_Logica_h">
+      <UniqueIdentifier>{b933d093-5216-4634-a1ba-272660d5200c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\2_Graficos_Estetica_h">
+      <UniqueIdentifier>{3ef34a04-ecfb-4dab-893a-72ce16c80413}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\3_Control_Escena_h">
+      <UniqueIdentifier>{165ed544-83a6-4ae3-8f79-02a71a473896}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\2_Graficos_Estetica_cpp">
+      <UniqueIdentifier>{20f1e6da-909c-469b-b4c6-1fef6fdf842f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\3_Control_Escena_cpp">
+      <UniqueIdentifier>{836db722-9195-4777-8ff4-ef57b5a6eae1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Estructuras.h">
+      <Filter>Header Files\1_Core_Logica_h</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicaJuego.h">
+      <Filter>Header Files\1_Core_Logica_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Header Files\2_Graficos_Estetica_h</Filter>
+    </ClInclude>
+    <ClInclude Include="ManejadorEventos.h">
+      <Filter>Header Files\3_Control_Escena_h</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="LogicaJuego.cpp">
+      <Filter>Resource Files\1_Core_Logica_cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Resource Files\2_Graficos_Estetica_cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ManejadorEventos.cpp">
+      <Filter>Resource Files\3_Control_Escena_cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

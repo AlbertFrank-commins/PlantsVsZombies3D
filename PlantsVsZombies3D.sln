@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36623.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlantsVsZombie3D", "PlantsVsZombie3D\PlantsVsZombie3D.vcxproj", "{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}.Debug|x64.ActiveCfg = Debug|x64
+		{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}.Debug|x64.Build.0 = Debug|x64
+		{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}.Debug|x86.ActiveCfg = Debug|Win32
+		{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}.Debug|x86.Build.0 = Debug|Win32
+		{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}.Release|x64.ActiveCfg = Release|x64
+		{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}.Release|x64.Build.0 = Release|x64
+		{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}.Release|x86.ActiveCfg = Release|Win32
+		{C68348DF-37AE-4CFA-BDA9-118D9B75FAF8}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {032F4287-33ED-400B-817B-04D59D64A1FC}
+	EndGlobalSection
+EndGlobal
