@@ -78,7 +78,7 @@ void DibujarPlanta(const Planta& planta)
     switch (planta.tipo) {
     case PLANTA_LANZAGUISANTES: ModeloLanzaguisantes(); break;
     case PLANTA_GIRASOL:        ModeloGirasol();        break;
-    case PLANTA_NUEZ:            ModeloNuez();           break;
+    case PLANTA_NUEz:            ModeloNuez();           break;
     }
 }
 
