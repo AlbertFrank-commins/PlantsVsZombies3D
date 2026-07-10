@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Resource Files\1_Core_Logica_cpp">
-      <UniqueIdentifier>{907ef368-1e36-4bb4-b232-d7f3bdfd73e6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\1_Core_Logica_h">
       <UniqueIdentifier>{b933d093-5216-4634-a1ba-272660d5200c}</UniqueIdentifier>
     </Filter>
@@ -25,10 +22,13 @@
     <Filter Include="Header Files\3_Control_Escena_h">
       <UniqueIdentifier>{165ed544-83a6-4ae3-8f79-02a71a473896}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\2_Graficos_Estetica_cpp">
+    <Filter Include="Source Files\1_Core_Logica_cpp">
+      <UniqueIdentifier>{907ef368-1e36-4bb4-b232-d7f3bdfd73e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\2_Graficos_Estetica_cpp">
       <UniqueIdentifier>{20f1e6da-909c-469b-b4c6-1fef6fdf842f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\3_Control_Escena_cpp">
+    <Filter Include="Source Files\3_Control_Escena_cpp">
       <UniqueIdentifier>{836db722-9195-4777-8ff4-ef57b5a6eae1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -48,13 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LogicaJuego.cpp">
-      <Filter>Resource Files\1_Core_Logica_cpp</Filter>
+      <Filter>Source Files\1_Core_Logica_cpp</Filter>
     </ClCompile>
     <ClCompile Include="Render.cpp">
-      <Filter>Resource Files\2_Graficos_Estetica_cpp</Filter>
+      <Filter>Source Files\2_Graficos_Estetica_cpp</Filter>
     </ClCompile>
     <ClCompile Include="ManejadorEventos.cpp">
-      <Filter>Resource Files\3_Control_Escena_cpp</Filter>
+      <Filter>Source Files\3_Control_Escena_cpp</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
