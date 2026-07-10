@@ -6,10 +6,9 @@
 
 class LogicaJuego {
 private:
-    Planta* tablero[5][9]; // Matriz lógica del juego (5 filas por 9 columnas)
+    Planta* tablero[5][9];
     float temporizadorOleada;
-
-    void gestionarOleadas(float deltaTime); // Control secuencial de oleadas automáticas
+    void gestionarOleadas(float deltaTime);
 
 public:
     std::vector<Zombie> listaZombies;
@@ -23,7 +22,10 @@ public:
     bool plantar(int fila, int columna, TipoPlanta tipo);
     void aparecerZombie(int fila, TipoZombie tipo);
     Planta* obtenerPlanta(int fila, int columna);
-    void actualizar(float deltaTime); // Ciclo general de simulación matemática
+    void actualizar(float deltaTime);
 };
+
+// Instancia global única del motor lógico que se compartirá con el Módulo 3
+extern LogicaJuego* g_Logica;
 
 #endif

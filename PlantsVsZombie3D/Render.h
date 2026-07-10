@@ -30,7 +30,7 @@ void DibujarTablero();
 // dibuja la entidad centrada en el origen local (0,0,0).
 void DibujarPlanta(const Planta& planta);
 void DibujarZombie(const Zombie& zombie);
-void DibujarProyectil(const Guisante& guisante);
+void DibujarProyectil(const Proyectil& proyectil);
 
 // ---------- Variantes especificas de modelado procedural ----------
 // Expuestas por si se necesitan pruebas aisladas o vistas previas;

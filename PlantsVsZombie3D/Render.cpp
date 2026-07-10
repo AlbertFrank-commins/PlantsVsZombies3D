@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include "Render.h"
-
+#define FILAS_TABLERO 5
+#define COLUMNAS_TABLERO 9
 // ============================================================
 //  Render.cpp
 //  Implementacion del Modulo Visual y Estetico.
@@ -73,29 +74,28 @@ void DibujarTablero()
 // ---------- Despachadores publicos ----------
 void DibujarPlanta(const Planta& planta)
 {
-    if (planta.estado == ESTADO_DESTRUIDO) return;
-
     switch (planta.tipo) {
-    case PLANTA_LANZAGUISANTES: ModeloLanzaguisantes(); break;
-    case PLANTA_GIRASOL:        ModeloGirasol();        break;
-    case PLANTA_NUEz:            ModeloNuez();           break;
+    case LANZAGUISANTES: ModeloLanzaguisantes(); break;
+    case GIRASOL:        ModeloGirasol();        break;
+    case NUEZ:           ModeloNuez();           break;
+    case CEREZA_EXPLOSIVA: // Espacio listo para la cereza
+        // Aquí tu compañero llamará a su función de dibujo
+        break;
     }
 }
 
 void DibujarZombie(const Zombie& zombie)
 {
-    if (zombie.estado == ESTADO_DESTRUIDO) return;
-
     switch (zombie.tipo) {
-    case ZOMBIE_NORMAL: ModeloZombieNormal(); break;
-    case ZOMBIE_CONO:   ModeloZombieCono();   break;
-    case ZOMBIE_CUBETA: ModeloZombieCubeta(); break;
+    case NORMAL:   ModeloZombieNormal(); break;
+    case CON_CONO: ModeloZombieCono();   break;
+    case CUBETA:   ModeloZombieCubeta(); break;
     }
 }
 
-void DibujarProyectil(const Guisante& guisante)
+void DibujarProyectil(const Proyectil& proyectil) // <- Cambiado a Proyectil
 {
-    if (guisante.estado == ESTADO_DESTRUIDO) return;
+    if (proyectil.estado == ESTADO_DESTRUIDO) return;
     ModeloGuisante();
 }
 

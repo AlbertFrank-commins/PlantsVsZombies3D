@@ -1,92 +1,79 @@
 #include <GL/glut.h>
 #include "ManejadorEventos.h"
-#include "../1_Core_Logica_h/Estructuras.h"
-#include "../2_Graficos_Estetica_h/Render.h"
-
-// Enlazamos los arreglos globales que controlará el Integrante 1 (Lógica)
-extern Zombie listaZombies[10];
-extern Guisante listaGuisantes[20];
-
-// Enlazamos las funciones de actualización del backend lógico
-void actualizarPosiciones();
-void verificarColisionesLogicas();
+#include "LogicaJuego.h"
+#include "Render.h"
 
 void callbackDisplay() {
-    // 1. Limpiamos los buffers de color y el Z-Buffer de profundidad (Clave del Módulo 3)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (g_Logica == nullptr) return;
 
-    // 2. Activamos la matriz de vista del modelo para posicionar la cámara
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // 3. Configuración de la cámara fija (Estilo perspectiva isométrica elevada)
-    gluLookAt(9.0f, 10.0f, 16.0f,  // Ubicación de la cámara en el aire
-        9.0f, 0.0f, 5.0f,    // Hacia dónde apunta (Centro del jardín)
-        0.0f, 1.0f, 0.0f);   // El eje Y representa la vertical hacia arriba
+    // Ángulo de cámara elevado fijado por tus especificaciones del Módulo 3
+    gluLookAt(9.0f, 10.0f, 16.0f,
+        9.0f, 0.0f, 5.0f,
+        0.0f, 1.0f, 0.0f);
 
-    // 4. Pintamos el fondo estático (El patio de la Persona 2)
-    dibujarPatio();
+    // 1. Renderizar el fondo (Llama a la función exacta de tu compañero 2)
+    DibujarTablero();
 
-    // 5. RENDERIZADO JERÁRQUICO DE ZOMBIES (Tu responsabilidad principal)
-    for (int i = 0; i < 10; i++) {
-        if (listaZombies[i].activo) {
-            glPushMatrix(); // <-- GUARDAMOS EL ESTADO DEL MUNDO LIMPIO
-            // Trasladamos el origen al X lógico y calculamos el Z multiplicando la fila por 2.0
-            glTranslatef(listaZombies[i].posX, 0.6f, (listaZombies[i].fila * 2.0f) + 1.0f);
-
-            // Si el zombie está caminando, puedes agregar una pequeña rotación estética
-            if (listaZombies[i].estado == CAMINANDO) {
-                // Simula un balanceo usando el tiempo o una pequeña inclinación estática
-                glRotatef(5.0f, 0.0f, 0.0f, 1.0f);
+    // 2. Renderizar Plantas en sus celdas mediante traducción de matrices
+    for (int f = 0; f < 5; f++) {
+        for (int c = 0; c < 9; c++) {
+            Planta* planta = g_Logica->obtenerPlanta(f, c);
+            if (planta != nullptr) {
+                glPushMatrix();
+                // Ajustamos el escalado: cada baldosa mide 1.0f de ancho en Render.cpp, centramos en la celda
+                glTranslatef(c * 1.0f + 0.5f, 0.0f, f * 1.0f + 0.5f);
+                DibujarPlanta(*planta);
+                glPopMatrix();
             }
-
-            // Llamamos a la función de modelado del Integrante 2
-            dibujarZombie();
-            glPopMatrix(); // <-- RESTAURAMOS EL MUNDO PARA EL SIGUIENTE OBJETO
         }
     }
 
-    // 6. RENDERIZADO DE PROYECTILES (Guisantes)
-    for (int i = 0; i < 20; i++) {
-        if (listaGuisantes[i].activo) {
-            glPushMatrix();
-            glTranslatef(listaGuisantes[i].posX, 0.6f, (listaGuisantes[i].fila * 2.0f) + 1.0f);
-            dibujarGuisante();
-            glPopMatrix();
-        }
+    // 3. Renderizar Vector de Zombies
+    for (const auto& zombie : g_Logica->listaZombies) {
+        glPushMatrix();
+        // Escalamos la posición X lógica a la relación visual de baldosas de 1.0f
+        float visualX = (zombie.posicionX / 2.0f) * 1.0f;
+        glTranslatef(visualX, 0.0f, zombie.fila * 1.0f + 0.5f);
+        DibujarZombie(zombie);
+        glPopMatrix();
     }
 
-    // Intercambiamos los buffers de dibujo para una animación fluida
+    // 4. Renderizar Vector de Proyectiles
+    for (const auto& proyectil : g_Logica->listaProyectiles) {
+        glPushMatrix();
+        float visualProjX = (proyectil.posicionX / 2.0f) * 1.0f;
+        glTranslatef(visualProjX, 0.0f, proyectil.fila * 1.0f + 0.5f);
+
+        // Adaptación de escala visual solicitada por el módulo de gráficos
+        glScalef(proyectil.escala, proyectil.escala, proyectil.escala);
+        ModeloGuisante();
+        glPopMatrix();
+    }
+
     glutSwapBuffers();
 }
 
 void callbackTimer(int v) {
-    // El reloj síncrono del juego: se ejecuta de forma continua cada 16 milisegundos (~60 FPS)
-
-    // Llamamos al Integrante 1 para que mueva las variables lógicas y procese los daños
-    actualizarPosiciones();
-    verificarColisionesLogicas();
-
-    // Forzamos a OpenGL a redibujar la pantalla con las nuevas posiciones
+    // Calculamos un deltaTime aproximado constante de simulación física a 60 FPS (16ms = ~0.016s)
+    if (g_Logica != nullptr) {
+        g_Logica->actualizar(0.016f);
+    }
     glutPostRedisplay();
-
-    // Reenganchamos el temporizador de FreeGLUT
     glutTimerFunc(16, callbackTimer, 0);
 }
 
 void callbackReshape(int w, int h) {
-    // Si la ventana cambia de tamaño, ajustamos la visualización y la lente de proyección
     if (h == 0) h = 1;
     glViewport(0, 0, w, h);
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45.0, (double)w / (double)h, 1.0, 100.0);
 }
 
 void callbackTeclado(unsigned char key, int x, int y) {
-    // Captura de eventos del teclado
-    if (key == 27) { // 27 es el código ASCII de la tecla ESCAPE
-        exit(0);     // Cierra la aplicación de forma limpia
-    }
+    if (key == 27) exit(0);
 }
