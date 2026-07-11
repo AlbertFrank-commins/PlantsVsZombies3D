@@ -8,24 +8,27 @@ int main(int argc, char** argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(1280, 720);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("Plants vs Zombies 3D - Unificado");
+    glutCreateWindow("Plants vs Zombies 2D - Unificado");
 
-    // Instanciamos el motor de la lógica orientada a objetos en la memoria global
+    // Instanciamos el motor de la logica orientada a objetos en la memoria global
     g_Logica = new LogicaJuego();
 
-    // Inicializaciones de hardware requeridas en el Módulo 2[cite: 1]
+    // Inicializaciones de hardware requeridas en el Modulo 2
     ConfigurarIluminacion();
 
-    // Asignación de callbacks del Módulo 3[cite: 1]
+    // Asignacion de callbacks del Modulo 3
     glutDisplayFunc(callbackDisplay);
     glutReshapeFunc(callbackReshape);
     glutKeyboardFunc(callbackTeclado);
+    glutMouseFunc(callbackMouse); // clic para seleccionar semilla / plantar
     glutTimerFunc(16, callbackTimer, 0);
 
-    glClearColor(0.02f, 0.02f, 0.08f, 1.0f);
+    // Cielo claro de patio trasero en vez del fondo oscuro original:
+    // encaja mejor con la ambientacion 2D de casa + cesped + arbustos.
+    glClearColor(0.55f, 0.75f, 0.95f, 1.0f);
 
     glutMainLoop();
 
-    delete g_Logica; // Liberación limpia de memoria al cerrar
+    delete g_Logica; // Liberacion limpia de memoria al cerrar
     return 0;
 }

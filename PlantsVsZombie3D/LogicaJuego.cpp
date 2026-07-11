@@ -4,20 +4,16 @@
 
 LogicaJuego* g_Logica = nullptr; // Inicialización de la variable global externa
 
-LogicaJuego::LogicaJuego() : soles(150), oleadaActual(0), temporizadorOleada(0.0f) {
+LogicaJuego::LogicaJuego() : soles(100), oleadaActual(0), temporizadorOleada(0.0f), temporizadorSol(0.0f) {
     for (int f = 0; f < 5; f++) {
         for (int c = 0; c < 9; c++) {
             tablero[f][c] = nullptr;
         }
     }
-
-    // MAQUETA COHERENTE: Plantamos las variantes para probar tu render
-    plantar(1, 2, LANZAGUISANTES);
-    plantar(2, 3, NUEZ);
-    plantar(3, 4, CEREZA_EXPLOSIVA);
-
-    // Generamos un zombie inicial
-    aparecerZombie(2, NORMAL);
+    // Arranque limpio: sin plantas ni zombies de maqueta. El jugador
+    // empieza con 100 soles para comprar su primera planta, y los
+    // zombies llegan solos mediante gestionarOleadas() (la primera
+    // oleada se dispara automaticamente porque listaZombies empieza vacia).
 }
 
 LogicaJuego::~LogicaJuego() {
@@ -31,12 +27,21 @@ LogicaJuego::~LogicaJuego() {
 bool LogicaJuego::plantar(int fila, int columna, TipoPlanta tipo) {
     if (fila < 0 || fila >= 5 || columna < 0 || columna >= 9) return false;
     if (tablero[fila][columna] != nullptr) return false;
-
-    int costo = (tipo == GIRASOL) ? 50 : (tipo == NUEZ) ? 50 : (tipo == CEREZA_EXPLOSIVA) ? 150 : 100;
+    int costo = CostoPlanta(tipo); // <- centralizado en Estructuras.h (lo usa tambien el HUD)
     if (soles < costo) return false;
-
     soles -= costo;
     tablero[fila][columna] = new Planta(tipo, fila, columna);
+    return true;
+}
+
+bool LogicaJuego::quitarPlanta(int fila, int columna) {
+    if (fila < 0 || fila >= 5 || columna < 0 || columna >= 9) return false;
+    Planta* planta = tablero[fila][columna];
+    if (planta == nullptr) return false;
+
+    soles += CostoPlanta(planta->tipo); // reembolso completo de lo que costo plantarla
+    delete planta;
+    tablero[fila][columna] = nullptr;
     return true;
 }
 
@@ -63,8 +68,47 @@ void LogicaJuego::gestionarOleadas(float deltaTime) {
     }
 }
 
+void LogicaJuego::gestionarSolesCaidos(float deltaTime) {
+    // 1) Aparicion periodica de soles nuevos en una celda aleatoria del tablero
+    temporizadorSol += deltaTime;
+    if (temporizadorSol >= SOL_INTERVALO_APARICION) {
+        temporizadorSol = 0.0f;
+        float columna = (float)(rand() % COLUMNAS_TABLERO) + 0.5f;
+        float fila = (float)(rand() % FILAS_TABLERO) + 0.5f;
+        listaSoles.push_back(SolCaido(columna, fila));
+    }
+
+    // 2) Simulacion de caida y desvanecimiento de cada sol activo
+    for (int i = (int)listaSoles.size() - 1; i >= 0; i--) {
+        SolCaido& sol = listaSoles[i];
+        if (!sol.enSuelo) {
+            sol.y -= SOL_VELOCIDAD_CAIDA * deltaTime;
+            if (sol.y <= SOL_ALTURA_SUELO) {
+                sol.y = SOL_ALTURA_SUELO;
+                sol.enSuelo = true;
+            }
+        }
+        else {
+            sol.tiempoEnSuelo += deltaTime;
+            if (sol.tiempoEnSuelo >= SOL_TIEMPO_VIDA_SUELO) {
+                sol.debeEliminarse = true;
+            }
+        }
+        if (sol.debeEliminarse) {
+            listaSoles.erase(listaSoles.begin() + i);
+        }
+    }
+}
+
+void LogicaJuego::recolectarSol(int indice) {
+    if (indice < 0 || indice >= (int)listaSoles.size()) return;
+    soles += SOL_VALOR;
+    listaSoles.erase(listaSoles.begin() + indice);
+}
+
 void LogicaJuego::actualizar(float deltaTime) {
     gestionarOleadas(deltaTime);
+    gestionarSolesCaidos(deltaTime);
 
     // 1. Proyectiles
     for (int i = (int)listaProyectiles.size() - 1; i >= 0; i--) {
@@ -83,7 +127,8 @@ void LogicaJuego::actualizar(float deltaTime) {
         }
         for (size_t z = 0; z < listaZombies.size(); z++) {
             Zombie& zombie = listaZombies[z];
-            if (zombie.fila == guisante.fila && guisante.posicionX >= zombie.posicionX && (guisante.posicionX - zombie.posicionX) < 0.5f) {
+            if (zombie.fila == guisante.fila && guisante.posicionX >= zombie.posicionX &&
+                (guisante.posicionX - zombie.posicionX) < 0.5f) {
                 zombie.vida -= guisante.danio;
                 guisante.debeEliminarse = true;
                 break;
@@ -97,7 +142,6 @@ void LogicaJuego::actualizar(float deltaTime) {
             Planta* planta = tablero[f][c];
             if (planta == nullptr) continue;
             planta->cooldownAtaque += deltaTime;
-
             if (planta->tipo == LANZAGUISANTES && planta->cooldownAtaque >= 2.0f) {
                 bool hayZombie = false;
                 for (const auto& z : listaZombies) {
@@ -115,31 +159,16 @@ void LogicaJuego::actualizar(float deltaTime) {
         }
     }
 
-    // 3. Zombies
+    // 3. Zombies (sin colision con plantas por el momento: caminan
+    // de largo y no se acumulan sobre las celdas ocupadas). Solo
+    // se eliminan si su vida llega a 0 (por ejemplo, por proyectiles).
     for (int i = (int)listaZombies.size() - 1; i >= 0; i--) {
         Zombie& zombie = listaZombies[i];
         if (zombie.vida <= 0) {
             listaZombies.erase(listaZombies.begin() + i);
             continue;
         }
-
-        int columnaActual = (int)(zombie.posicionX / 2.0f); // Dividido por tu escala de celda de 2.0f
-        if (columnaActual >= 0 && columnaActual < 9 && tablero[zombie.fila][columnaActual] != nullptr) {
-            zombie.estaComiendo = true;
-            Planta* plantaAfectada = tablero[zombie.fila][columnaActual];
-            plantaAfectada->vida -= (int)(zombie.danio * deltaTime);
-            if (plantaAfectada->vida <= 0) {
-                delete tablero[zombie.fila][columnaActual];
-                tablero[zombie.fila][columnaActual] = nullptr;
-                zombie.estaComiendo = false;
-            }
-        }
-        else {
-            zombie.estaComiendo = false;
-        }
-
-        if (!zombie.estaComiendo) {
-            zombie.posicionX -= zombie.velocidad * deltaTime;
-        }
+        zombie.estaComiendo = false;
+        zombie.posicionX -= zombie.velocidad * deltaTime;
     }
 }
