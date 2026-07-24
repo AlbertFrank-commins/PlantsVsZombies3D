@@ -26,7 +26,13 @@ void DibujarEscenario(float tiempo);
 void DibujarFondoCielo(int anchoVentana, int altoVentana);
 
 // ---------- Interfaz 2D (HUD) ----------
-void DibujarInterfaz(int anchoVentana, int altoVentana, int soles, TipoPlanta tipoSeleccionado);
+// NUEVO: "cooldowns" es un arreglo de 5 floats (indexado por
+// TipoPlanta) con el tiempo de recarga restante de cada semilla;
+// se usa para dibujar el "velo" gris que tapa el icono mientras
+// esta en recarga.
+void DibujarInterfaz(int anchoVentana, int altoVentana, int soles, TipoPlanta tipoSeleccionado, const float cooldowns[5]);
+// NUEVO: pantalla de victoria (se gano la partida).
+void DibujarVictoria(int anchoVentana, int altoVentana);
 TipoPlanta SemillaEnPosicion(int x, int y, int anchoVentana);
 
 // ---------- Despachadores por tipo (dibujan un sprite segun el estado) ----------

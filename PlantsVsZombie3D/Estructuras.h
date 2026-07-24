@@ -27,7 +27,9 @@ inline EstadoVida CalcularEstadoVida(int vidaActual, int vidaMaxima) {
 // que dibuja Render.cpp en callbackDisplay y que interpreta
 // ManejadorEventos.cpp en callbackMouse/Teclado.
 // ============================================================
-enum EstadoJuego { JUEGO_MENU, JUEGO_JUGANDO, JUEGO_PAUSA, JUEGO_GAME_OVER };
+enum EstadoJuego { JUEGO_MENU, JUEGO_JUGANDO, JUEGO_PAUSA, JUEGO_GAME_OVER, JUEGO_VICTORIA };
+// NUEVO: cuantas oleadas hay que sobrevivir para ganar la partida.
+const int OLEADAS_PARA_GANAR = 10;
 
 // ============================================================
 // Dimensiones y centro del tablero (5 filas x 9 columnas, celdas
@@ -72,6 +74,19 @@ inline int CostoPlanta(TipoPlanta tipo) {
     case CEREZA_EXPLOSIVA:  return 150;
     case LANZAGUISANTES:    return 100;
     default:                return 0;
+    }
+}
+
+// NUEVO: tiempo de recarga (en segundos) despues de plantar una
+// semilla, antes de poder volver a plantarla. Es la mecanica de
+// "cooldown" clasica de PvZ: evita spamear la misma planta.
+inline float TiempoRecargaPlanta(TipoPlanta tipo) {
+    switch (tipo) {
+    case GIRASOL:          return 6.0f;
+    case LANZAGUISANTES:   return 6.0f;
+    case NUEZ:             return 18.0f;
+    case CEREZA_EXPLOSIVA: return 40.0f;
+    default:               return 0.0f;
     }
 }
 

@@ -6,6 +6,7 @@ LogicaJuego* g_Logica = nullptr; // Inicializaci�n de la variable global exter
 
 LogicaJuego::LogicaJuego() : soles(100), oleadaActual(0), temporizadorOleada(0.0f),
 temporizadorSol(0.0f), estadoJuego(JUEGO_MENU) {
+    for (int t = 0; t < 5; t++) cooldownSemillas[t] = 0.0f;
     for (int f = 0; f < 5; f++) {
         for (int c = 0; c < 9; c++) {
             tablero[f][c] = nullptr;
@@ -37,6 +38,7 @@ void LogicaJuego::ReiniciarJuego() {
     eventosSonido.clear();
     listaCarretillas.clear();
     for (int f = 0; f < 5; f++) listaCarretillas.push_back(Carretilla(f)); // NUEVO
+    for (int t = 0; t < 5; t++) cooldownSemillas[t] = 0.0f;
     soles = 100;
     oleadaActual = 0;
     temporizadorOleada = 0.0f;
@@ -49,8 +51,10 @@ bool LogicaJuego::plantar(int fila, int columna, TipoPlanta tipo) {
     if (tablero[fila][columna] != nullptr) return false;
     int costo = CostoPlanta(tipo);
     if (soles < costo) return false;
+    if (cooldownSemillas[tipo] > 0.0f) return false; // NUEVO: semilla en recarga
     soles -= costo;
     tablero[fila][columna] = new Planta(tipo, fila, columna);
+    cooldownSemillas[tipo] = TiempoRecargaPlanta(tipo); // NUEVO: arranca la recarga
     eventosSonido.push_back("plantar"); // NUEVO
     return true;
 }
@@ -76,6 +80,14 @@ Planta* LogicaJuego::obtenerPlanta(int fila, int columna) {
 }
 
 void LogicaJuego::gestionarOleadas(float deltaTime) {
+    // NUEVO: si ya se lanzaron todas las oleadas y no queda ni un
+    // zombie en pie, se gano la partida.
+    if (oleadaActual >= OLEADAS_PARA_GANAR) {
+        if (listaZombies.empty()) {
+            estadoJuego = JUEGO_VICTORIA;
+        }
+        return;
+    }
     temporizadorOleada += deltaTime;
     if (temporizadorOleada >= 20.0f || (listaZombies.empty() && oleadaActual == 0)) {
         oleadaActual++;
@@ -185,6 +197,14 @@ void LogicaJuego::actualizar(float deltaTime) {
     gestionarColisionesPlantaZombie(deltaTime); // NUEVO
     gestionarCarretillas(deltaTime); // NUEVO
 
+    // NUEVO: recarga de semillas (cooldown de plantado)
+    for (int t = 0; t < 5; t++) {
+        if (cooldownSemillas[t] > 0.0f) {
+            cooldownSemillas[t] -= deltaTime;
+            if (cooldownSemillas[t] < 0.0f) cooldownSemillas[t] = 0.0f;
+        }
+    }
+
     // 1. Proyectiles
     for (int i = (int)listaProyectiles.size() - 1; i >= 0; i--) {
         Proyectil& guisante = listaProyectiles[i];
@@ -234,6 +254,24 @@ void LogicaJuego::actualizar(float deltaTime) {
             else if (planta->tipo == GIRASOL && planta->cooldownAtaque >= 7.0f) {
                 soles += 25;
                 planta->cooldownAtaque = 0.0f;
+            }
+            // NUEVO: la cereza explosiva tiene una mecha de 1.5s; al
+            // cumplirse, elimina a todos los zombies en un radio de 2
+            // casillas (filas y columnas) desde su posicion, y luego
+            // se consume (desaparece del tablero).
+            else if (planta->tipo == CEREZA_EXPLOSIVA && planta->cooldownAtaque >= 1.5f) {
+                const int RADIO_EXPLOSION = 2; // en casillas
+                float columnaCentro = (float)c + 0.5f;
+                for (auto& zombie : listaZombies) {
+                    if (abs(zombie.fila - f) > RADIO_EXPLOSION) continue;
+                    float columnaZombie = zombie.posicionX / ANCHO_CELDA_LOGICO;
+                    if (fabsf(columnaZombie - columnaCentro) > (float)RADIO_EXPLOSION) continue;
+                    zombie.vida = 0; // el limpiador de zombies (paso 3) la retira este mismo frame
+                }
+                eventosSonido.push_back("explosion");
+                delete planta;
+                tablero[f][c] = nullptr;
+                continue; // el puntero ya no es valido, no seguir usandolo
             }
         }
     }

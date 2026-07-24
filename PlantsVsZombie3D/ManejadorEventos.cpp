@@ -125,11 +125,14 @@ void callbackDisplay() {
         DibujarSol(sol, cx, cy);
     }
 
-    DibujarInterfaz(g_AnchoVentana, g_AltoVentana, g_Logica->soles, g_TipoSeleccionado);
+    DibujarInterfaz(g_AnchoVentana, g_AltoVentana, g_Logica->soles, g_TipoSeleccionado, g_Logica->cooldownSemillas);
 
-    // ---------------- GAME OVER: se dibuja encima, como overlay ----------------
+    // ---------------- GAME OVER / VICTORIA: se dibujan encima, como overlay ----------------
     if (g_Logica->estadoJuego == JUEGO_GAME_OVER) {
         DibujarGameOver(g_AnchoVentana, g_AltoVentana);
+    }
+    else if (g_Logica->estadoJuego == JUEGO_VICTORIA) {
+        DibujarVictoria(g_AnchoVentana, g_AltoVentana);
     }
 
     glutSwapBuffers();
@@ -208,8 +211,8 @@ void callbackMouse(int button, int state, int x, int y) {
         return;
     }
 
-    // ---------------- GAME OVER: cualquier clic vuelve al menu ----------------
-    if (g_Logica->estadoJuego == JUEGO_GAME_OVER) {
+    // ---------------- GAME OVER / VICTORIA: cualquier clic vuelve al menu ----------------
+    if (g_Logica->estadoJuego == JUEGO_GAME_OVER || g_Logica->estadoJuego == JUEGO_VICTORIA) {
         if (button == GLUT_LEFT_BUTTON) {
             g_Logica->estadoJuego = JUEGO_MENU;
             g_TipoSeleccionado = NINGUNA;

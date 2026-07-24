@@ -23,6 +23,10 @@ public:
     std::vector<Carretilla> listaCarretillas; // NUEVO: una por fila
     int soles;
     int oleadaActual;
+    // NUEVO: tiempo de recarga restante por tipo de semilla (indexado
+    // por el enum TipoPlanta). Mientras sea > 0, no se puede plantar
+    // esa semilla de nuevo.
+    float cooldownSemillas[5];
 
     // NUEVO: estado global del juego.
     EstadoJuego estadoJuego;
